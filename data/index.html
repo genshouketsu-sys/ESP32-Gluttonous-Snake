@@ -146,14 +146,18 @@
         [ SYSTEM BOOTING... ]
     </div>
 
-    <div class="stats-box">
-        <span>ROOM: <input type="text" id="roomInput" class="room-input" value="--"><button class="room-btn" onclick="manualJoin()">JOIN</button></span>
-        <div style="margin-top:5px;">
-            <button class="room-btn" onclick="leaveRoom()" style="color:#ff1439;border-color:#ff1439">LEAVE</button>
-            <button class="room-btn" onclick="switchRole()">SWITCH ROLE</button>
+    <div class="stats-box" style="flex-direction: column; gap: 5px;">
+        <div style="display: flex; justify-content: space-between; width: 100%;">
+            <span class="score-p1">P1: <span id="s1">0</span></span>
+            <span>ROOM: <input type="text" id="roomInput" class="room-input" value="--">
+                <button class="room-btn" onclick="manualJoin()">JOIN</button>
+            </span>
+            <span class="score-p2">P2: <span id="s2">0</span></span>
         </div>
-        <span class="score-p1">P1: <span id="s1">0</span></span>
-        <span class="score-p2">P2: <span id="s2">0</span></span>
+        <div style="display: flex; justify-content: center; gap: 10px; width: 100%;">
+            <button class="room-btn" onclick="leaveRoom()" id="btnLeave" style="color:#ff1439;border-color:#ff1439;display:none;">[ LEAVE ]</button>
+            <button class="room-btn" onclick="switchRole()" id="btnSwitch" style="display:none;">[ SWITCH ROLE ]</button>
+        </div>
     </div>
 
     <div class="game-container">
@@ -307,6 +311,8 @@
             document.getElementById('btnAuto').style.display = 'block';
             document.getElementById('btnSingle').style.display = 'block';
             document.getElementById('btnRestart').style.display = 'none';
+            document.getElementById('btnLeave').style.display = 'none';
+            document.getElementById('btnSwitch').style.display = 'none';
             msgEl.innerText = "SYSTEM ONLINE";
             overlay.classList.remove('hidden');
         }
@@ -330,6 +336,8 @@
             curRoomEl.value = 'LOCAL';
             p1Name = myName;
             become(3);
+            document.getElementById('btnLeave').style.display = 'block';
+            document.getElementById('btnSwitch').style.display = 'none';
         }
 
         function become(role) {
@@ -337,6 +345,11 @@
             isGameOver = false;
             overlay.classList.add('hidden');
             document.getElementById('btnRestart').style.display = 'none';
+            
+            if (role !== 3) {
+                document.getElementById('btnLeave').style.display = 'block';
+                document.getElementById('btnSwitch').style.display = 'block';
+            }
             
             // Announce name
             if (ws && ws.readyState === 1 && role > 0 && role !== 3) {
