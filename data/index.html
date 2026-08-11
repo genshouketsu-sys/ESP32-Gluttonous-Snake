@@ -420,8 +420,20 @@
             if (myRole === 1 || myRole === 3) {
                 state.p1dx = myDx; state.p1dy = myDy;
                 let h1 = {x: state.p1[0].x + state.p1dx, y: state.p1[0].y + state.p1dy};
-                if(h1.x < 0) h1.x = tileCount-1; if(h1.x >= tileCount) h1.x = 0;
-                if(h1.y < 0) h1.y = tileCount-1; if(h1.y >= tileCount) h1.y = 0;
+                
+                if (myRole === 3) {
+                    let collision = false;
+                    if(h1.x < 0 || h1.x >= tileCount || h1.y < 0 || h1.y >= tileCount) collision = true;
+                    for(let p of state.p1) if(h1.x === p.x && h1.y === p.y) collision = true;
+                    if (collision) {
+                        handleSinglePlayerGameOver();
+                        return;
+                    }
+                } else {
+                    if(h1.x < 0) h1.x = tileCount-1; if(h1.x >= tileCount) h1.x = 0;
+                    if(h1.y < 0) h1.y = tileCount-1; if(h1.y >= tileCount) h1.y = 0;
+                }
+                
                 state.p1.unshift(h1);
                 
                 if(h1.x === state.apple.x && h1.y === state.apple.y) {
@@ -471,6 +483,29 @@
                 document.getElementById('btnSingle').style.display = 'none';
                 document.getElementById('btnRestart').style.display = 'block';
             }
+        }
+
+        function handleSinglePlayerGameOver() {
+            isGameOver = true;
+            clearInterval(gameLoop);
+            
+            let scores = JSON.parse(localStorage.getItem('spScores') || '[]');
+            scores.push({name: myName, score: state.s1});
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 5);
+            localStorage.setItem('spScores', JSON.stringify(scores));
+            
+            let rankHtml = "<div style='font-size:0.6rem; color:#ffeb3b; margin-top:10px;'>[ LOCAL RANKING ]<br>";
+            scores.forEach((s, i) => { rankHtml += `${i+1}. ${s.name} - ${s.score}<br>`; });
+            rankHtml += "</div>";
+            
+            msgEl.innerHTML = `GAME OVER!<br><span style='color:var(--neon-green)'>SCORE: ${state.s1}</span><br>${rankHtml}`;
+            overlay.classList.remove('hidden');
+            document.getElementById('pName').style.display = 'none';
+            document.getElementById('winScoreBox').style.display = 'none';
+            document.getElementById('btnAuto').style.display = 'none';
+            document.getElementById('btnSingle').style.display = 'none';
+            document.getElementById('btnRestart').style.display = 'block';
         }
 
         function turn(dir) {
