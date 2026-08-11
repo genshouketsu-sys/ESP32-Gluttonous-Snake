@@ -242,7 +242,11 @@
             ws.onmessage = (e) => {
                 if(e.data.startsWith("WINNERS:")) {
                     let wl = JSON.parse(e.data.substring(8));
-                    winnerListEl.innerHTML = '[ HALL OF FAME ]<br>' + wl.join(' | ');
+                    let html = "[ HALL OF FAME ]<br>";
+                    wl.forEach((name, i) => {
+                        html += `<div style="display:flex; justify-content:space-between; margin-top:3px;"><span>${i+1}.</span><span>${name}</span></div>`;
+                    });
+                    winnerListEl.innerHTML = html;
                     return;
                 }
                 if(e.data.startsWith("ROOMLIST:")) {
