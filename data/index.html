@@ -7,17 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-green: #39ff14;
-            --neon-red: #ff1439;
-            --dark-bg: #050a10;
-            --grid-line: rgba(57, 255, 20, 0.15);
+            --pixel-dark: #1f2415;
+            --lcd-bg: #8ba036;
+            --lcd-light: #9cb142;
+            --grid-line: rgba(31, 36, 21, 0.1);
         }
         
         * { box-sizing: border-box; }
 
         body {
-            background-color: var(--dark-bg);
-            color: var(--neon-green);
+            background-color: var(--lcd-bg);
+            color: var(--pixel-dark);
             font-family: 'Press Start 2P', monospace;
             margin: 0; padding: 0;
             display: flex; flex-direction: column;
@@ -26,11 +26,11 @@
             background-image: 
                 linear-gradient(var(--grid-line) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-            background-size: 20px 20px;
-            touch-action: none; /* Prevent double tap zoom */
-            user-select: none; /* Prevent text selection */
+            background-size: 4px 4px;
+            touch-action: none;
+            user-select: none;
             -webkit-user-select: none;
-            -webkit-touch-callout: none; /* Prevent long press menu */
+            -webkit-touch-callout: none;
         }
         
         input {
@@ -42,108 +42,131 @@
         .header-box {
             position: relative;
             width: 320px;
-            border: 1px solid var(--neon-green);
-            padding: 10px 20px;
-            margin-bottom: 10px;
+            border: 3px solid var(--pixel-dark);
+            padding: 8px 10px;
+            margin-bottom: 8px;
             text-align: center;
-            background: rgba(5, 10, 16, 0.8);
-            box-shadow: inset 0 0 10px rgba(57, 255, 20, 0.1);
+            background: var(--lcd-light);
+            box-shadow: 4px 4px 0 var(--pixel-dark);
         }
 
-        .header-box::before, .header-box::after {
-            content: ''; position: absolute;
-            width: 10px; height: 10px; background: var(--neon-green);
-        }
-        .header-box::before { top: -1px; left: -1px; }
-        .header-box::after { bottom: -1px; right: -1px; }
-
-        h1 { font-size: 1rem; margin: 0; line-height: 1.5; text-shadow: 0 0 5px rgba(57, 255, 20, 0.5); }
-        .subtitle { font-size: 0.5rem; margin-top: 5px; color: rgba(57, 255, 20, 0.7); }
+        h1 { font-size: 14px; margin: 0; line-height: 1.2; text-shadow: 2px 2px 0px rgba(31,36,21,0.15); }
+        .subtitle { font-size: 8px; margin-top: 4px; color: var(--pixel-dark); opacity: 0.8; letter-spacing: 1px; }
 
         .stats-box {
             display: flex; justify-content: space-between; align-items: center;
-            width: 320px; margin-bottom: 10px; font-size: 0.6rem;
-            border: 1px solid var(--neon-green); padding: 5px 10px;
-            background: rgba(5, 10, 16, 0.8);
+            width: 320px; margin-bottom: 8px; font-size: 10px;
+            border: 3px solid var(--pixel-dark); padding: 6px 10px;
+            background: var(--lcd-light);
+            box-shadow: 4px 4px 0 var(--pixel-dark);
         }
         
-        .score-p1 { color: var(--neon-green); }
-        .score-p2 { color: var(--neon-red); }
+        .score-p1, .score-p2 { color: var(--pixel-dark); font-weight: bold; font-size: 12px; }
 
         .room-input {
-            background: transparent; border: none; border-bottom: 1px solid var(--neon-green);
-            color: var(--neon-green); font-family: inherit; font-size: 0.6rem;
-            width: 40px; text-align: center; outline: none;
+            background: transparent; border: none; border-bottom: 2px solid var(--pixel-dark);
+            color: var(--pixel-dark); font-family: inherit; font-size: 10px;
+            width: 45px; text-align: center; outline: none; padding-bottom: 2px;
         }
         
         .room-btn {
-            background: var(--neon-green); color: var(--dark-bg);
-            border: none; font-family: inherit; font-size: 0.6rem;
-            padding: 2px 5px; cursor: pointer;
+            background: var(--pixel-dark); color: var(--lcd-light);
+            border: 2px solid var(--pixel-dark); font-family: inherit; font-size: 8px;
+            padding: 4px 8px; cursor: pointer; margin-left: 4px;
+            box-shadow: 2px 2px 0 rgba(31,36,21,0.3);
+        }
+        .room-btn:active {
+            background: var(--lcd-light); color: var(--pixel-dark);
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+            transform: translate(2px, 2px);
         }
 
         .room-list-box {
-            width: 320px; font-size: 0.5rem; text-align: center;
-            margin-bottom: 10px; color: rgba(57, 255, 20, 0.7);
-            border: 1px dashed var(--neon-green); padding: 5px;
-            display: flex; flex-wrap: wrap; gap: 5px; justify-content: center;
+            width: 320px; font-size: 8px; text-align: center;
+            margin-bottom: 8px; color: var(--pixel-dark);
+            border: 2px dashed var(--pixel-dark); padding: 6px;
+            display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+            background: var(--lcd-light);
+            line-height: 1.5;
         }
         .room-item {
-            cursor: pointer; padding: 2px 5px; border: 1px solid var(--neon-green);
+            cursor: pointer; padding: 4px 6px; border: 2px solid var(--pixel-dark);
+            background: var(--lcd-light); box-shadow: 2px 2px 0 var(--pixel-dark);
         }
-        .room-item:hover { background: var(--neon-green); color: var(--dark-bg); }
-        .room-item.full { border-color: var(--neon-red); color: var(--neon-red); }
-        .room-item.full:hover { background: var(--neon-red); color: var(--dark-bg); }
+        .room-item:hover { background: var(--pixel-dark); color: var(--lcd-light); }
+        .room-item:active { box-shadow: 0 0 0 transparent; transform: translate(2px, 2px); }
+        .room-item.full { border-style: dotted; opacity: 0.7; box-shadow: none; }
+        .room-item.full:hover { background: var(--lcd-light); color: var(--pixel-dark); }
 
         .game-container {
-            position: relative; padding: 5px;
+            position: relative; padding: 8px;
             width: 320px; display: flex; justify-content: center; align-items: center;
-            border: 1px solid var(--neon-green); background: rgba(5, 10, 16, 0.9);
+            border: 3px solid var(--pixel-dark); background: var(--lcd-light);
+            box-shadow: 4px 4px 0 var(--pixel-dark);
         }
 
         canvas {
-            display: block; background-color: var(--dark-bg);
+            display: block; background-color: var(--lcd-bg);
+            border: 3px solid var(--pixel-dark);
             background-image: 
-                linear-gradient(rgba(57, 255, 20, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(57, 255, 20, 0.05) 1px, transparent 1px);
+                linear-gradient(rgba(31, 36, 21, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(31, 36, 21, 0.05) 1px, transparent 1px);
             background-size: 15px 15px;
         }
 
         .controls {
-            margin-top: 15px; display: flex; justify-content: space-between; width: 320px; gap: 10px;
+            margin-top: 10px; display: flex; justify-content: space-between; width: 320px; gap: 8px;
         }
 
         .btn {
-            flex: 1; height: 60px;
-            background: rgba(57, 255, 20, 0.1); border: 1px solid var(--neon-green);
-            color: var(--neon-green); font-family: inherit; font-size: 0.8rem;
+            flex: 1; height: 50px;
+            background: var(--lcd-light); border: 3px solid var(--pixel-dark);
+            color: var(--pixel-dark); font-family: inherit; font-size: 14px;
             cursor: pointer; outline: none; display: flex; align-items: center; justify-content: center;
+            box-shadow: 4px 4px 0 var(--pixel-dark);
+            transition: all 0.1s;
         }
-        .btn:active { background: var(--neon-green); color: var(--dark-bg); }
+        .btn:active { 
+            background: var(--pixel-dark); color: var(--lcd-light); 
+            box-shadow: 0px 0px 0 var(--pixel-dark);
+            transform: translate(4px, 4px);
+        }
 
         #overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 10, 16, 0.85);
+            background: rgba(139, 160, 54, 0.92);
             display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;
         }
         .hidden { display: none !important; }
 
         .role-btn {
-            margin: 10px; padding: 10px; font-size: 0.7rem;
-            background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green);
-            cursor: pointer; width: 80%;
+            margin: 6px; padding: 10px; font-size: 10px;
+            background: var(--lcd-light); border: 3px solid var(--pixel-dark); color: var(--pixel-dark);
+            cursor: pointer; width: 85%;
+            box-shadow: 4px 4px 0 var(--pixel-dark);
+        }
+        .role-btn:active {
+            box-shadow: 0 0 0 var(--pixel-dark);
+            transform: translate(4px, 4px);
         }
         
         .name-input {
-            background: rgba(5, 10, 16, 0.9); border: 1px solid var(--neon-green);
-            color: var(--neon-green); font-family: inherit; font-size: 0.8rem;
-            padding: 10px; text-align: center; margin-bottom: 20px; width: 80%;
+            background: var(--lcd-light); border: 3px solid var(--pixel-dark);
+            color: var(--pixel-dark); font-family: inherit; font-size: 12px;
+            padding: 10px; text-align: center; margin-bottom: 20px; width: 85%;
+            box-shadow: inset 3px 3px 0 rgba(31,36,21,0.2);
+            outline: none;
+        }
+        .name-input::placeholder {
+            color: rgba(31,36,21,0.5);
         }
         
         .winners-box {
-            width: 320px; font-size: 0.5rem; text-align: center;
-            margin-top: 10px; color: #ffeb3b;
-            border: 1px dashed #ffeb3b; padding: 5px;
+            width: 320px; font-size: 8px; text-align: center;
+            margin-top: 10px; color: var(--pixel-dark);
+            border: 2px dashed var(--pixel-dark); padding: 6px;
+            background: var(--lcd-light);
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -167,7 +190,7 @@
             <span class="score-p2">P2: <span id="s2">0</span></span>
         </div>
         <div style="display: flex; justify-content: center; gap: 10px; width: 100%;">
-            <button class="room-btn" onclick="leaveRoom()" id="btnLeave" style="color:#ff1439;border-color:#ff1439;display:none;">[ LEAVE ]</button>
+            <button class="room-btn" onclick="leaveRoom()" id="btnLeave" style="display:none;">[ LEAVE ]</button>
             <button class="room-btn" onclick="switchRole()" id="btnSwitch" style="display:none;">[ SWITCH ROLE ]</button>
         </div>
     </div>
@@ -177,13 +200,13 @@
         <div id="overlay">
             <h2 id="msg" style="font-size: 0.8rem; text-align: center; margin-bottom: 20px;">CONNECTING...</h2>
             <input type="text" id="pName" class="name-input" placeholder="ENTER NAME" style="display:none">
-            <div id="winScoreBox" style="display:none; text-align:center; margin-bottom:10px;">
-                <span style="font-size:0.6rem">TARGET SCORE:</span>
-                <input type="number" id="winScoreInput" value="100" style="width:60px; background:transparent; border:none; border-bottom:1px solid var(--neon-green); color:var(--neon-green); font-family:inherit; text-align:center;" onchange="updateWinScore()">
+            <div id="winScoreBox" style="display:none; text-align:center; margin-bottom:12px;">
+                <span style="font-size:10px">TARGET SCORE:</span>
+                <input type="number" id="winScoreInput" value="100" style="width:60px; background:transparent; border:none; border-bottom:2px solid var(--pixel-dark); color:var(--pixel-dark); font-family:inherit; font-size:10px; text-align:center; outline:none;" onchange="updateWinScore()">
             </div>
             <button class="role-btn" id="btnAuto" onclick="autoJoin()" style="display:none">[ AUTO MATCH ]</button>
-            <button class="role-btn" id="btnSingle" onclick="startSinglePlayer()" style="display:none; color:white; border-color:white">[ SINGLE PLAYER ]</button>
-            <button class="role-btn" id="btnRestart" onclick="requestRestart()" style="display:none; color:white; border-color:white">[ START NEW GAME ]</button>
+            <button class="role-btn" id="btnSingle" onclick="startSinglePlayer()" style="display:none">[ SINGLE PLAYER ]</button>
+            <button class="role-btn" id="btnRestart" onclick="requestRestart()" style="display:none">[ START NEW GAME ]</button>
         </div>
     </div>
 
@@ -233,13 +256,20 @@
         }
 
         function connectWS() {
-            ws = new WebSocket('ws://' + location.hostname + ':81/');
+            let host = location.hostname;
+            if (!host) host = '192.168.4.1';
+            ws = new WebSocket('ws://' + host + ':81/');
+            
             ws.onopen = () => {
                 msgEl.innerText = "SYSTEM ONLINE";
                 document.getElementById('pName').style.display = 'block';
                 document.getElementById('winScoreBox').style.display = 'block';
                 document.getElementById('btnAuto').style.display = 'block';
                 document.getElementById('btnSingle').style.display = 'block';
+            };
+            ws.onclose = () => {
+                msgEl.innerHTML = "CONNECTION LOST<br>RETRYING...";
+                setTimeout(connectWS, 2000);
             };
             ws.onmessage = (e) => {
                 if(e.data.startsWith("WINNERS:")) {
@@ -300,7 +330,7 @@
                         
                         document.getElementById('s1').innerText = state.s1;
                         document.getElementById('s2').innerText = state.s2;
-                        if (myRole === 0) draw(); // Spectator draws on any state update
+                        draw(); // Force immediate redraw on any state update for real-time sync
                     }
                 } catch(err) {}
             };
@@ -527,7 +557,7 @@
             
             renderLocalRanking();
             
-            msgEl.innerHTML = `GAME OVER!<br><br><span style='color:var(--neon-green)'>SCORE: ${state.s1}</span>`;
+            msgEl.innerHTML = `GAME OVER!<br><br><span>SCORE: ${state.s1}</span>`;
             overlay.classList.remove('hidden');
             document.getElementById('pName').style.display = 'none';
             document.getElementById('winScoreBox').style.display = 'none';
@@ -547,17 +577,112 @@
             myDx = ndx; myDy = ndy;
         }
 
+        function drawSnake(sArr, isP2) {
+            for (let i = 0; i < sArr.length; i++) {
+                let p = sArr[i];
+                let px = p.x * 15;
+                let py = p.y * 15;
+                let cx = px + 7.5;
+                let cy = py + 7.5;
+
+                if (i === 0) {
+                    let hdx = 0, hdy = 0;
+                    if (sArr.length > 1) {
+                        hdx = sArr[0].x - sArr[1].x;
+                        hdy = sArr[0].y - sArr[1].y;
+                        if (hdx > 1) hdx = -1; else if (hdx < -1) hdx = 1;
+                        if (hdy > 1) hdy = -1; else if (hdy < -1) hdy = 1;
+                    } else {
+                        hdx = (isP2 ? state.p2dx : state.p1dx); 
+                        hdy = (isP2 ? state.p2dy : state.p1dy);
+                    }
+                    
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    let angle = 0;
+                    if (hdx === 1) angle = Math.PI / 2;
+                    else if (hdx === -1) angle = -Math.PI / 2;
+                    else if (hdy === 1) angle = Math.PI;
+                    ctx.rotate(angle);
+                    
+                    ctx.fillRect(-7.5, -7.5, 15, 15);
+                    ctx.clearRect(-7.5, -2.5, 5, 5);
+                    ctx.clearRect(2.5, -2.5, 5, 5);
+                    ctx.fillRect(-2.5, -12.5, 5, 5);
+                    
+                    if (isP2) {
+                        ctx.clearRect(-2.5, 2.5, 5, 5); 
+                    }
+                    
+                    ctx.restore();
+                } else {
+                    let d = sArr.length - 1 - i;
+                    if (d >= 3) {
+                        ctx.fillRect(px, py, 15, 15);
+                        if (isP2) {
+                            ctx.clearRect(px + 2, py + 2, 11, 11);
+                            ctx.fillRect(px + 5, py + 5, 5, 5);
+                        } else {
+                            ctx.clearRect(px + 5, py + 5, 5, 5);
+                        }
+                    } else if (d === 2) {
+                        ctx.fillRect(px, py, 15, 15);
+                        if (isP2) {
+                            ctx.clearRect(px + 5, py + 5, 5, 5);
+                        }
+                    } else {
+                        let tSize = d === 1 ? 11 : 5;
+                        let half = tSize / 2;
+                        
+                        ctx.fillRect(cx - half, cy - half, tSize, tSize);
+                        
+                        let prev = sArr[i-1];
+                        let dx1 = prev.x - p.x;
+                        let dy1 = prev.y - p.y;
+                        if (dx1 > 1) dx1 = -1; else if (dx1 < -1) dx1 = 1;
+                        if (dy1 > 1) dy1 = -1; else if (dy1 < -1) dy1 = 1;
+                        
+                        if (dx1 === 1) ctx.fillRect(px + 7, cy - half, 8, tSize);
+                        if (dx1 === -1) ctx.fillRect(px, cy - half, 8, tSize);
+                        if (dy1 === 1) ctx.fillRect(cx - half, py + 7, tSize, 8);
+                        if (dy1 === -1) ctx.fillRect(cx - half, py, tSize, 8);
+                        
+                        if (d > 0) {
+                            let next = sArr[i+1];
+                            let dx2 = next.x - p.x;
+                            let dy2 = next.y - p.y;
+                            if (dx2 > 1) dx2 = -1; else if (dx2 < -1) dx2 = 1;
+                            if (dy2 > 1) dy2 = -1; else if (dy2 < -1) dy2 = 1;
+                            
+                            if (dx2 === 1) ctx.fillRect(px + 7, cy - half, 8, tSize);
+                            if (dx2 === -1) ctx.fillRect(px, cy - half, 8, tSize);
+                            if (dy2 === 1) ctx.fillRect(cx - half, py + 7, tSize, 8);
+                            if (dy2 === -1) ctx.fillRect(cx - half, py, tSize, 8);
+                        }
+                    }
+                }
+            }
+        }
+
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(state.apple.x*gridSize+1, state.apple.y*gridSize+1, gridSize-2, gridSize-2);
+            ctx.fillStyle = '#1f2415';
             
-            ctx.fillStyle = '#39ff14';
-            for(let p of state.p1) ctx.fillRect(p.x*gridSize+1, p.y*gridSize+1, gridSize-2, gridSize-2);
+            let ax = state.apple.x * gridSize;
+            let ay = state.apple.y * gridSize;
+            ctx.fillRect(ax + 2, ay, 11, 15);
+            ctx.fillRect(ax, ay + 2, 15, 11);
+            ctx.clearRect(ax + 4, ay + 4, 7, 7);
+            ctx.fillRect(ax + 7, ay + 2, 1, 11);
+            ctx.fillRect(ax + 5, ay + 4, 5, 1);
+            ctx.fillRect(ax + 5, ay + 7, 5, 1);
+            ctx.fillRect(ax + 5, ay + 10, 5, 1);
+            ctx.fillRect(ax + 4, ay + 5, 1, 2);
+            ctx.fillRect(ax + 10, ay + 8, 1, 2);
             
+            drawSnake(state.p1, false);
             if (myRole !== 3) {
-                ctx.fillStyle = '#ff1439';
-                for(let p of state.p2) ctx.fillRect(p.x*gridSize+1, p.y*gridSize+1, gridSize-2, gridSize-2);
+                drawSnake(state.p2, true);
             }
         }
 

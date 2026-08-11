@@ -6,7 +6,7 @@
 #include <WebSocketsServer.h>
 #include <map>
 
-const char* ssid = "ESP32-Web-Server";
+const char* ssid = "GenShouGAME-Lab";
 const char* password = "11111111";
 
 const byte DNS_PORT = 53;
