@@ -175,6 +175,10 @@
         <div id="overlay">
             <h2 id="msg" style="font-size: 0.8rem; text-align: center; margin-bottom: 20px;">CONNECTING...</h2>
             <input type="text" id="pName" class="name-input" placeholder="ENTER NAME" style="display:none">
+            <div id="winScoreBox" style="display:none; text-align:center; margin-bottom:10px;">
+                <span style="font-size:0.6rem">TARGET SCORE:</span>
+                <input type="number" id="winScoreInput" value="100" style="width:60px; background:transparent; border:none; border-bottom:1px solid var(--neon-green); color:var(--neon-green); font-family:inherit; text-align:center;" onchange="updateWinScore()">
+            </div>
             <button class="role-btn" id="btnAuto" onclick="autoJoin()" style="display:none">[ AUTO MATCH ]</button>
             <button class="role-btn" id="btnSingle" onclick="startSinglePlayer()" style="display:none; color:white; border-color:white">[ SINGLE PLAYER ]</button>
             <button class="role-btn" id="btnRestart" onclick="requestRestart()" style="display:none; color:white; border-color:white">[ START NEW GAME ]</button>
@@ -219,12 +223,18 @@
         let myDy = 0;
         let turnLocked = false;
         let isGameOver = false;
+        let winScore = 100;
+
+        function updateWinScore() {
+            winScore = parseInt(document.getElementById('winScoreInput').value) || 100;
+        }
 
         function connectWS() {
             ws = new WebSocket('ws://' + location.hostname + ':81/');
             ws.onopen = () => {
                 msgEl.innerText = "SYSTEM ONLINE";
                 document.getElementById('pName').style.display = 'block';
+                document.getElementById('winScoreBox').style.display = 'block';
                 document.getElementById('btnAuto').style.display = 'block';
                 document.getElementById('btnSingle').style.display = 'block';
             };
@@ -249,6 +259,11 @@
                 
                 try {
                     let d = JSON.parse(e.data);
+                    
+                    if (d.winScore) { 
+                        winScore = d.winScore; 
+                        document.getElementById('winScoreInput').value = winScore; 
+                    }
                     
                     if (d.cmd === "RESTART") {
                         isGameOver = false;
@@ -318,6 +333,7 @@
             myRole = 0; isGameOver = false; curRoomEl.value = '--';
             document.getElementById('s1').innerText = '0'; document.getElementById('s2').innerText = '0';
             document.getElementById('pName').style.display = 'block';
+            document.getElementById('winScoreBox').style.display = 'block';
             document.getElementById('btnAuto').style.display = 'block';
             document.getElementById('btnSingle').style.display = 'block';
             document.getElementById('btnRestart').style.display = 'none';
@@ -355,10 +371,16 @@
             isGameOver = false;
             overlay.classList.add('hidden');
             document.getElementById('btnRestart').style.display = 'none';
+            document.getElementById('winScoreBox').style.display = 'none';
             
             if (role !== 3) {
                 document.getElementById('btnLeave').style.display = 'block';
                 document.getElementById('btnSwitch').style.display = 'block';
+            }
+            
+            if (role === 1 || role === 3) {
+                updateWinScore();
+                if(ws && ws.readyState===1 && role === 1) ws.send("MSG:" + JSON.stringify({winScore: winScore}));
             }
             
             // Announce name
@@ -432,18 +454,19 @@
             draw();
 
             // Check Win Condition
-            if (state.s1 >= 100 || state.s2 >= 100) {
+            if (state.s1 >= winScore || state.s2 >= winScore) {
                 isGameOver = true;
                 clearInterval(gameLoop);
-                let winner = state.s1 >= 100 ? p1Name : p2Name;
+                let winner = state.s1 >= winScore ? p1Name : p2Name;
                 if(ws && ws.readyState===1 && myRole !== 3) {
-                    if (state.s1 >= 100 && myRole === 1) ws.send("WINNER:" + winner);
-                    if (state.s2 >= 100 && myRole === 2) ws.send("WINNER:" + winner);
+                    if (state.s1 >= winScore && myRole === 1) ws.send("WINNER:" + winner);
+                    if (state.s2 >= winScore && myRole === 2) ws.send("WINNER:" + winner);
                     ws.send("MSG:" + JSON.stringify({gameover: true, winner: winner}));
                 }
                 msgEl.innerHTML = winner + " WINS!";
                 overlay.classList.remove('hidden');
                 document.getElementById('pName').style.display = 'none';
+                document.getElementById('winScoreBox').style.display = 'none';
                 document.getElementById('btnAuto').style.display = 'none';
                 document.getElementById('btnSingle').style.display = 'none';
                 document.getElementById('btnRestart').style.display = 'block';
