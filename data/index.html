@@ -224,6 +224,7 @@
         let turnLocked = false;
         let isGameOver = false;
         let winScore = 100;
+        let currentSpeed = 200;
 
         function updateWinScore() {
             winScore = parseInt(document.getElementById('winScoreInput').value) || 100;
@@ -362,6 +363,7 @@
             curRoomEl.value = 'LOCAL';
             p1Name = myName;
             become(3);
+            renderLocalRanking();
             document.getElementById('btnLeave').style.display = 'block';
             document.getElementById('btnSwitch').style.display = 'none';
         }
@@ -400,7 +402,8 @@
             if (role === 2) { myDx = -1; myDy = 0; }
             
             if(gameLoop) clearInterval(gameLoop);
-            if(role > 0) gameLoop = setInterval(playerUpdate, 200);
+            currentSpeed = 200;
+            if(role > 0) gameLoop = setInterval(playerUpdate, currentSpeed);
         }
 
         function placeApple() {
@@ -438,6 +441,11 @@
                 
                 if(h1.x === state.apple.x && h1.y === state.apple.y) {
                     state.s1 += 10; placeApple();
+                    if (myRole === 3) {
+                        currentSpeed = Math.max(50, 200 - (state.s1 * 0.5));
+                        clearInterval(gameLoop);
+                        gameLoop = setInterval(playerUpdate, currentSpeed);
+                    }
                 } else { state.p1.pop(); }
                 
                 if (myRole === 1 && ws && ws.readyState===1) {
@@ -485,6 +493,15 @@
             }
         }
 
+        function renderLocalRanking() {
+            let scores = JSON.parse(localStorage.getItem('spScores') || '[]');
+            let rankHtml = "[ LOCAL RANKING ]<br>";
+            scores.forEach((s, i) => { 
+                rankHtml += `<div style="display:flex; justify-content:space-between; margin-top:3px;"><span>${i+1}.${s.name}</span><span>${s.score}</span></div>`;
+            });
+            winnerListEl.innerHTML = rankHtml;
+        }
+
         function handleSinglePlayerGameOver() {
             isGameOver = true;
             clearInterval(gameLoop);
@@ -495,11 +512,9 @@
             scores = scores.slice(0, 5);
             localStorage.setItem('spScores', JSON.stringify(scores));
             
-            let rankHtml = "<div style='font-size:0.6rem; color:#ffeb3b; margin-top:10px;'>[ LOCAL RANKING ]<br>";
-            scores.forEach((s, i) => { rankHtml += `${i+1}. ${s.name} - ${s.score}<br>`; });
-            rankHtml += "</div>";
+            renderLocalRanking();
             
-            msgEl.innerHTML = `GAME OVER!<br><span style='color:var(--neon-green)'>SCORE: ${state.s1}</span><br>${rankHtml}`;
+            msgEl.innerHTML = `GAME OVER!<br><br><span style='color:var(--neon-green)'>SCORE: ${state.s1}</span>`;
             overlay.classList.remove('hidden');
             document.getElementById('pName').style.display = 'none';
             document.getElementById('winScoreBox').style.display = 'none';
