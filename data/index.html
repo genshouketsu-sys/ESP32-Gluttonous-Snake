@@ -27,6 +27,16 @@
                 linear-gradient(var(--grid-line) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
             background-size: 20px 20px;
+            touch-action: none; /* Prevent double tap zoom */
+            user-select: none; /* Prevent text selection */
+            -webkit-user-select: none;
+            -webkit-touch-callout: none; /* Prevent long press menu */
+        }
+        
+        input {
+            touch-action: auto;
+            user-select: auto;
+            -webkit-user-select: auto;
         }
 
         .header-box {
