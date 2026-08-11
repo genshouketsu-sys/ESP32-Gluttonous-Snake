@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SNAKE ON THE THRONE: MULTIPLAYER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-green: #39ff14;
+            --neon-red: #ff1439;
+            --dark-bg: #050a10;
+            --grid-line: rgba(57, 255, 20, 0.15);
+        }
+        
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--neon-green);
+            font-family: 'Press Start 2P', monospace;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            height: 100vh; overflow: hidden;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .header-box {
+            position: relative;
+            border: 1px solid var(--neon-green);
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            text-align: center;
+            background: rgba(5, 10, 16, 0.8);
+            box-shadow: inset 0 0 10px rgba(57, 255, 20, 0.1);
+        }
+
+        .header-box::before, .header-box::after {
+            content: ''; position: absolute;
+            width: 10px; height: 10px; background: var(--neon-green);
+        }
+        .header-box::before { top: -1px; left: -1px; }
+        .header-box::after { bottom: -1px; right: -1px; }
+
+        h1 { font-size: 1rem; margin: 0; line-height: 1.5; text-shadow: 0 0 5px rgba(57, 255, 20, 0.5); }
+        .subtitle { font-size: 0.5rem; margin-top: 5px; color: rgba(57, 255, 20, 0.7); }
+
+        .stats-box {
+            display: flex; justify-content: space-between; align-items: center;
+            width: 320px; margin-bottom: 10px; font-size: 0.6rem;
+            border: 1px solid var(--neon-green); padding: 5px 10px;
+            background: rgba(5, 10, 16, 0.8);
+        }
+        
+        .score-p1 { color: var(--neon-green); }
+        .score-p2 { color: var(--neon-red); }
+
+        .room-input {
+            background: transparent; border: none; border-bottom: 1px solid var(--neon-green);
+            color: var(--neon-green); font-family: inherit; font-size: 0.6rem;
+            width: 40px; text-align: center; outline: none;
+        }
+        
+        .room-btn {
+            background: var(--neon-green); color: var(--dark-bg);
+            border: none; font-family: inherit; font-size: 0.6rem;
+            padding: 2px 5px; cursor: pointer;
+        }
+
+        .room-list-box {
+            width: 320px; font-size: 0.5rem; text-align: center;
+            margin-bottom: 10px; color: rgba(57, 255, 20, 0.7);
+            border: 1px dashed var(--neon-green); padding: 5px;
+            display: flex; flex-wrap: wrap; gap: 5px; justify-content: center;
+        }
+        .room-item {
+            cursor: pointer; padding: 2px 5px; border: 1px solid var(--neon-green);
+        }
+        .room-item:hover { background: var(--neon-green); color: var(--dark-bg); }
+        .room-item.full { border-color: var(--neon-red); color: var(--neon-red); }
+        .room-item.full:hover { background: var(--neon-red); color: var(--dark-bg); }
+
+        .game-container {
+            position: relative; padding: 5px;
+            border: 1px solid var(--neon-green); background: rgba(5, 10, 16, 0.9);
+        }
+
+        canvas {
+            display: block; background-color: var(--dark-bg);
+            background-image: 
+                linear-gradient(rgba(57, 255, 20, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(57, 255, 20, 0.05) 1px, transparent 1px);
+            background-size: 15px 15px;
+        }
+
+        .controls {
+            margin-top: 15px; display: flex; justify-content: space-between; width: 300px; gap: 10px;
+        }
+
+        .btn {
+            flex: 1; height: 60px;
+            background: rgba(57, 255, 20, 0.1); border: 1px solid var(--neon-green);
+            color: var(--neon-green); font-family: inherit; font-size: 0.8rem;
+            cursor: pointer; outline: none; display: flex; align-items: center; justify-content: center;
+        }
+        .btn:active { background: var(--neon-green); color: var(--dark-bg); }
+
+        #overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 10, 16, 0.85);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;
+        }
+        .hidden { display: none !important; }
+
+        .role-btn {
+            margin: 10px; padding: 10px; font-size: 0.7rem;
+            background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green);
+            cursor: pointer; width: 80%;
+        }
+        
+        .name-input {
+            background: rgba(5, 10, 16, 0.9); border: 1px solid var(--neon-green);
+            color: var(--neon-green); font-family: inherit; font-size: 0.8rem;
+            padding: 10px; text-align: center; margin-bottom: 20px; width: 80%;
+        }
+        
+        .winners-box {
+            width: 320px; font-size: 0.5rem; text-align: center;
+            margin-top: 10px; color: #ffeb3b;
+            border: 1px dashed #ffeb3b; padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-box">
+        <h1>SNAKE ON THE THRONE</h1>
+        <div class="subtitle">MULTIPLAYER NETWORK EDITION</div>
+    </div>
+    
+    <div class="room-list-box" id="roomList">
+        [ SYSTEM BOOTING... ]
+    </div>
+
+    <div class="stats-box">
+        <span>ROOM: <input type="text" id="roomInput" class="room-input" value="--"><button class="room-btn" onclick="manualJoin()">JOIN</button></span>
+        <div style="margin-top:5px;">
+            <button class="room-btn" onclick="leaveRoom()" style="color:#ff1439;border-color:#ff1439">LEAVE</button>
+            <button class="room-btn" onclick="switchRole()">SWITCH ROLE</button>
+        </div>
+        <span class="score-p1">P1: <span id="s1">0</span></span>
+        <span class="score-p2">P2: <span id="s2">0</span></span>
+    </div>
+
+    <div class="game-container">
+        <canvas id="gameCanvas" width="300" height="300"></canvas>
+        <div id="overlay">
+            <h2 id="msg" style="font-size: 0.8rem; text-align: center; margin-bottom: 20px;">CONNECTING...</h2>
+            <input type="text" id="pName" class="name-input" placeholder="ENTER NAME" style="display:none">
+            <button class="role-btn" id="btnAuto" onclick="autoJoin()" style="display:none">[ AUTO MATCH ]</button>
+            <button class="role-btn" id="btnSingle" onclick="startSinglePlayer()" style="display:none; color:white; border-color:white">[ SINGLE PLAYER ]</button>
+            <button class="role-btn" id="btnRestart" onclick="requestRestart()" style="display:none; color:white; border-color:white">[ START NEW GAME ]</button>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="turn(-1)">< TURN</button>
+        <button class="btn" onclick="turn(1)">TURN ></button>
+    </div>
+    
+    <div class="winners-box" id="winnerList">
+        [ HALL OF FAME ]
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const overlay = document.getElementById('overlay');
+        const msgEl = document.getElementById('msg');
+        const roomListEl = document.getElementById('roomList');
+        const curRoomEl = document.getElementById('roomInput');
+        const winnerListEl = document.getElementById('winnerList');
+        
+        const gridSize = 15;
+        const tileCount = canvas.width / gridSize;
+        
+        let ws;
+        let myRole = 0; // 0=Spectator, 1=Host(P1), 2=P2
+        let gameLoop;
+        let myName = "ANON";
+        let p1Name = "P1";
+        let p2Name = "P2";
+        
+        let state = {
+            p1: [{x: 5, y: 5}], p1dx: 1, p1dy: 0, s1: 0,
+            p2: [{x: 15, y: 15}], p2dx: -1, p2dy: 0, s2: 0,
+            apple: {x: 10, y: 10}
+        };
+
+        let myDx = 0;
+        let myDy = 0;
+        let turnLocked = false;
+        let isGameOver = false;
+
+        function connectWS() {
+            ws = new WebSocket('ws://' + location.hostname + ':81/');
+            ws.onopen = () => {
+                msgEl.innerText = "SYSTEM ONLINE";
+                document.getElementById('pName').style.display = 'block';
+                document.getElementById('btnAuto').style.display = 'block';
+                document.getElementById('btnSingle').style.display = 'block';
+            };
+            ws.onmessage = (e) => {
+                if(e.data.startsWith("WINNERS:")) {
+                    let wl = JSON.parse(e.data.substring(8));
+                    winnerListEl.innerHTML = '[ HALL OF FAME ]<br>' + wl.join(' | ');
+                    return;
+                }
+                if(e.data.startsWith("ROOMLIST:")) {
+                    let rl = JSON.parse(e.data.substring(9));
+                    updateRoomList(rl);
+                    return;
+                }
+                if(e.data.startsWith("ASSIGNED:")) {
+                    let parts = e.data.split(":");
+                    curRoomEl.value = parts[1];
+                    let role = parseInt(parts[2]);
+                    become(role);
+                    return;
+                }
+                
+                try {
+                    let d = JSON.parse(e.data);
+                    
+                    if (d.cmd === "RESTART") {
+                        isGameOver = false;
+                        if (myRole === 1 || myRole === 2) become(myRole);
+                        else overlay.classList.add('hidden');
+                    }
+                    if (d.nameMsg) {
+                        if (d.role === 1) p1Name = d.nameMsg;
+                        if (d.role === 2) p2Name = d.nameMsg;
+                    }
+                    if (d.gameover) {
+                        isGameOver = true;
+                        if(gameLoop) clearInterval(gameLoop);
+                        msgEl.innerHTML = d.winner + " WINS!";
+                        overlay.classList.remove('hidden');
+                        document.getElementById('pName').style.display = 'none';
+                        document.getElementById('btnAuto').style.display = 'none';
+                        document.getElementById('btnSingle').style.display = 'none';
+                        document.getElementById('btnRestart').style.display = 'block';
+                    }
+                    
+                    // Distributed State Merging
+                    if (!isGameOver && myRole !== 3) {
+                        if (d.p1 && myRole !== 1) { state.p1 = d.p1; state.s1 = d.s1; }
+                        if (d.p2 && myRole !== 2) { state.p2 = d.p2; state.s2 = d.s2; }
+                        if (d.apple) { state.apple = d.apple; }
+                        
+                        document.getElementById('s1').innerText = state.s1;
+                        document.getElementById('s2').innerText = state.s2;
+                        if (myRole === 0) draw(); // Spectator draws on any state update
+                    }
+                } catch(err) {}
+            };
+        }
+        connectWS();
+
+        function updateRoomList(rl) {
+            roomListEl.innerHTML = 'ACTIVE ROOMS: ';
+            let keys = Object.keys(rl).sort();
+            if(keys.length === 0) roomListEl.innerHTML += 'NONE';
+            for(let k of keys) {
+                let c = rl[k];
+                let div = document.createElement('div');
+                div.className = 'room-item ' + (c >= 2 ? 'full' : '');
+                div.innerText = k + '(' + c + '/2)';
+                div.onclick = () => { curRoomEl.value = k; manualJoin(); };
+                roomListEl.appendChild(div);
+            }
+        }
+
+        function autoJoin() {
+            let n = document.getElementById('pName').value.trim();
+            if (n) myName = n;
+            if(ws && ws.readyState === 1) ws.send("AUTO_JOIN");
+        }
+
+        function manualJoin() {
+            let n = document.getElementById('pName').value.trim();
+            if (n) myName = n;
+            let r = curRoomEl.value;
+            if(r !== '--' && r !== '' && ws && ws.readyState === 1) ws.send("JOIN:" + r);
+        }
+        
+        function leaveRoom() {
+            if(ws && ws.readyState===1) ws.send("LEAVE_ROOM");
+            if(gameLoop) clearInterval(gameLoop);
+            myRole = 0; isGameOver = false; curRoomEl.value = '--';
+            document.getElementById('s1').innerText = '0'; document.getElementById('s2').innerText = '0';
+            document.getElementById('pName').style.display = 'block';
+            document.getElementById('btnAuto').style.display = 'block';
+            document.getElementById('btnSingle').style.display = 'block';
+            document.getElementById('btnRestart').style.display = 'none';
+            msgEl.innerText = "SYSTEM ONLINE";
+            overlay.classList.remove('hidden');
+        }
+
+        function switchRole() {
+            if(ws && ws.readyState===1 && myRole !== 3) {
+                if(myRole === 0) ws.send("BECOME_PLAYER");
+                else ws.send("BECOME_SPECTATOR");
+            }
+        }
+        
+        function requestRestart() {
+            if(ws && ws.readyState===1 && myRole !== 3) ws.send("MSG:" + JSON.stringify({cmd: "RESTART"}));
+            else if (myRole === 3) startSinglePlayer();
+        }
+
+        function startSinglePlayer() {
+            let n = document.getElementById('pName').value.trim();
+            if (n) myName = n;
+            if(ws && ws.readyState===1) ws.send("LEAVE_ROOM");
+            curRoomEl.value = 'LOCAL';
+            p1Name = myName;
+            become(3);
+        }
+
+        function become(role) {
+            myRole = role;
+            isGameOver = false;
+            overlay.classList.add('hidden');
+            document.getElementById('btnRestart').style.display = 'none';
+            
+            // Announce name
+            if (ws && ws.readyState === 1 && role > 0 && role !== 3) {
+                ws.send("MSG:" + JSON.stringify({nameMsg: myName, role: role}));
+                if (role === 1) p1Name = myName;
+                if (role === 2) p2Name = myName;
+            }
+
+            state = {
+                p1: [{x: 3, y: 3}, {x: 2, y: 3}], p1dx: 1, p1dy: 0, s1: 0,
+                p2: [{x: 16, y: 16}, {x: 17, y: 16}], p2dx: -1, p2dy: 0, s2: 0,
+                apple: {x: 10, y: 10}
+            };
+            
+            if (role === 1 || role === 3) { myDx = 1; myDy = 0; }
+            if (role === 2) { myDx = -1; myDy = 0; }
+            
+            if(gameLoop) clearInterval(gameLoop);
+            if(role > 0) gameLoop = setInterval(playerUpdate, 200);
+        }
+
+        function placeApple() {
+            state.apple = {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+            if(ws && ws.readyState===1 && myRole !== 3) {
+                ws.send("MSG:" + JSON.stringify({apple: state.apple}));
+            }
+        }
+
+        // Distributed Compute
+        function playerUpdate() {
+            if (isGameOver) return;
+            
+            if (myRole === 1 || myRole === 3) {
+                state.p1dx = myDx; state.p1dy = myDy;
+                let h1 = {x: state.p1[0].x + state.p1dx, y: state.p1[0].y + state.p1dy};
+                if(h1.x < 0) h1.x = tileCount-1; if(h1.x >= tileCount) h1.x = 0;
+                if(h1.y < 0) h1.y = tileCount-1; if(h1.y >= tileCount) h1.y = 0;
+                state.p1.unshift(h1);
+                
+                if(h1.x === state.apple.x && h1.y === state.apple.y) {
+                    state.s1 += 10; placeApple();
+                } else { state.p1.pop(); }
+                
+                if (myRole === 1 && ws && ws.readyState===1) {
+                    ws.send("MSG:" + JSON.stringify({p1: state.p1, s1: state.s1}));
+                }
+            } 
+            else if (myRole === 2) {
+                state.p2dx = myDx; state.p2dy = myDy;
+                let h2 = {x: state.p2[0].x + state.p2dx, y: state.p2[0].y + state.p2dy};
+                if(h2.x < 0) h2.x = tileCount-1; if(h2.x >= tileCount) h2.x = 0;
+                if(h2.y < 0) h2.y = tileCount-1; if(h2.y >= tileCount) h2.y = 0;
+                state.p2.unshift(h2);
+                
+                if(h2.x === state.apple.x && h2.y === state.apple.y) {
+                    state.s2 += 10; placeApple();
+                } else { state.p2.pop(); }
+                
+                if (ws && ws.readyState===1) {
+                    ws.send("MSG:" + JSON.stringify({p2: state.p2, s2: state.s2}));
+                }
+            }
+
+            document.getElementById('s1').innerText = state.s1;
+            document.getElementById('s2').innerText = state.s2;
+            turnLocked = false; 
+            draw();
+
+            // Check Win Condition
+            if (state.s1 >= 100 || state.s2 >= 100) {
+                isGameOver = true;
+                clearInterval(gameLoop);
+                let winner = state.s1 >= 100 ? p1Name : p2Name;
+                if(ws && ws.readyState===1 && myRole !== 3) {
+                    if (state.s1 >= 100 && myRole === 1) ws.send("WINNER:" + winner);
+                    if (state.s2 >= 100 && myRole === 2) ws.send("WINNER:" + winner);
+                    ws.send("MSG:" + JSON.stringify({gameover: true, winner: winner}));
+                }
+                msgEl.innerHTML = winner + " WINS!";
+                overlay.classList.remove('hidden');
+                document.getElementById('pName').style.display = 'none';
+                document.getElementById('btnAuto').style.display = 'none';
+                document.getElementById('btnSingle').style.display = 'none';
+                document.getElementById('btnRestart').style.display = 'block';
+            }
+        }
+
+        function turn(dir) {
+            if (myRole === 0 || turnLocked || isGameOver) return;
+            turnLocked = true;
+            
+            let ndx, ndy;
+            if (dir === -1) { ndx = myDy; ndy = -myDx; } 
+            else { ndx = -myDy; ndy = myDx; }
+            
+            myDx = ndx; myDy = ndy;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(state.apple.x*gridSize+1, state.apple.y*gridSize+1, gridSize-2, gridSize-2);
+            
+            ctx.fillStyle = '#39ff14';
+            for(let p of state.p1) ctx.fillRect(p.x*gridSize+1, p.y*gridSize+1, gridSize-2, gridSize-2);
+            
+            if (myRole !== 3) {
+                ctx.fillStyle = '#ff1439';
+                for(let p of state.p2) ctx.fillRect(p.x*gridSize+1, p.y*gridSize+1, gridSize-2, gridSize-2);
+            }
+        }
+
+        window.addEventListener('keydown', e => {
+            if(e.key === 'ArrowLeft' || e.key === 'a') turn(-1);
+            if(e.key === 'ArrowRight' || e.key === 'd') turn(1);
+        });
+        draw();
+    </script>
+</body>
+</html>
