@@ -358,7 +358,12 @@
         }
         
         function requestRestart() {
-            if(ws && ws.readyState===1 && myRole !== 3) ws.send("MSG:" + JSON.stringify({cmd: "RESTART"}));
+            if(ws && ws.readyState===1 && myRole !== 3) {
+                ws.send("MSG:" + JSON.stringify({cmd: "RESTART"}));
+                isGameOver = false;
+                if (myRole === 1 || myRole === 2) become(myRole);
+                else overlay.classList.add('hidden');
+            }
             else if (myRole === 3) startSinglePlayer();
         }
 
