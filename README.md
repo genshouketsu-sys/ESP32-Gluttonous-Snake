@@ -14,16 +14,17 @@
 - **强制 Captive Portal**: 通电即生成 AP 热点，手机连上自动弹出网页游戏界面，纯纯的街机体验。
 - **高可用匹配机制**: 支持 1~99 号房间。可以 `AUTO MATCH` 自动找空位，也可以手动输入房间号观战或参战。
 - **动态身份流转**: 提供 玩家/观战者 动态切换功能。
-- **百分子局**: 率先拿到 100 分 (吃 10 个苹果) 的玩家强制冻结画面并触发胜者全网通报。
-- **单机模式**: 想一个人练手？直接进 `SINGLE PLAYER`，本地运算，跟服务器零交互。
+- **目标分数赛制**: 房主可自由修改目标分数（默认100分）。率先达标的玩家强制冻结全场画面，并触发胜者全网通报。
+- **无缝复赛**: 胜出后点击 `[ START NEW GAME ]` 即可瞬间重连同房间，开启下一轮。
+- **硬核单机模式**: 解除分数上限、开启自杀与撞墙判定。随着得分增加，蛇的速度会平滑提升。阵亡后会结算分数并更新本地专属排行榜 (`LOCAL RANKING`)。
 
 ### 游玩规则
-1. 手机连上热点 `ESP32-Web-Server` (默认密码: `11111111`)。
+1. 手机连上热点 `ESP32-Web-Server` (默认密码: `11111111`，支持在 `main.cpp` 自定义修改)。
 2. 在自动弹出的 Captive Portal 页面中输入你的名字 (ID)。
 3. 点击 `[ AUTO MATCH ]` 自动进入空余房间，或手动输入房间号后 `JOIN`。
 4. **控制**: 游戏只有 `<- TURN` 和 `TURN ->` 两个按钮。控制蛇头相对当前方向的左转和右转，专门为手机大拇指操控优化。
-5. **胜负判定**: 先吃满 10 个方块到达 100 分的人赢。
-6. **耻辱柱/名人堂**: 胜者 ID 会被推送到所有连接了该热点的手机底部，直接霸屏，直到 ESP32 断电重启。
+5. **胜负判定**: 联机模式下率先达到房主设定的目标分数（默认 100 分）即为胜利。
+6. **耻辱柱/名人堂**: 胜者 ID 会被推送到所有连接了该热点的手机底部，并严丝合缝地在两端对齐展示。
 
 ### 部署说明 (PlatformIO)
 本项目基于 PlatformIO 构建，请确保已安装 VSCode + PlatformIO 插件。
@@ -45,16 +46,17 @@ The ESP32 acts merely as a high-speed data relay hub, offloading all game render
 - **Captive Portal**: Generates an AP hotspot immediately upon power-up. Connect with a phone and the web game interface pops up automatically.
 - **Auto Matchmaking**: Supports rooms 1~99. Use `AUTO MATCH` to find an empty slot, or manually enter a room number to play or spectate.
 - **Dynamic Roles**: Switch between Player and Spectator dynamically.
-- **100-Point Rule**: The first player to reach 100 points (eat 10 apples) freezes the screen and triggers a global winner announcement.
-- **Single Player**: Want to practice alone? Hit `SINGLE PLAYER` for local execution with zero server interaction.
+- **Custom Target Score**: The room host can set the target score (default 100). The first player to reach it freezes the screen and triggers a global winner announcement.
+- **Seamless Rematch**: Hit `[ START NEW GAME ]` after a match to instantly reconnect to the same room for another round.
+- **Hardcore Single Player**: No score limits, wall/self-collision enabled. The snake accelerates smoothly as your score increases. Deaths trigger a score summary and update a local leaderboard (`LOCAL RANKING`).
 
 ### How to Play
-1. Connect to Wi-Fi `ESP32-Web-Server` (Password: `11111111`).
+1. Connect to Wi-Fi `ESP32-Web-Server` (Password: `11111111`, customizable in `main.cpp`).
 2. Enter your Name/ID in the Captive Portal page.
 3. Click `[ AUTO MATCH ]` or enter a room number and click `JOIN`.
 4. **Controls**: Only two buttons: `<- TURN` and `TURN ->`. They steer the snake left/right relative to its current direction (optimized for thumbs).
-5. **Win Condition**: Eat 10 apples to hit 100 points and win instantly.
-6. **Hall of Fame**: The winner's ID is pushed to all devices connected to the ESP32 hotspot until it reboots.
+5. **Win Condition**: In multiplayer, reach the host's target score to win instantly.
+6. **Hall of Fame**: The winner's ID is pushed to the bottom of all devices connected to the ESP32 hotspot, neatly aligned to both ends.
 
 ### Deployment (PlatformIO)
 This project is built using PlatformIO. Please ensure you have VSCode + PlatformIO installed.
@@ -76,16 +78,17 @@ ESP32を高速データ中継ハブとして機能させ、ゲームのレンダ
 - **キャプティブポータル**: 電源を入れると即座にAPホットスポットを生成。スマホで接続するだけで自動的にゲーム画面がポップアップします。
 - **自動マッチング**: 1〜99号室をサポート。`AUTO MATCH` で空きを探すか、手動でルーム番号を入力して観戦・参加が可能です。
 - **動的ロール切り替え**: プレイヤーと観戦者の役割を動的に切り替える機能。
-- **100点先取ルール**: 先に100ポイント（リンゴ10個）を獲得したプレイヤーが画面をフリーズさせ、全員に勝者としてアナウンスされます。
-- **シングルプレイヤー**: サーバーと通信せず、ローカル環境のみで動作する一人用練習モードを搭載。
+- **カスタム目標スコア**: ルームホストは目標スコア（デフォルト100）を自由に変更可能。先に到達したプレイヤーが画面をフリーズさせ、勝者としてアナウンスされます。
+- **シームレスな再戦**: 試合後 `[ START NEW GAME ]` を押すだけで、即座に同じルームに再接続して連戦が可能。
+- **ハードコア・シングルプレイヤー**: スコア上限なし、壁や自分への衝突判定あり。スコアに応じてヘビの移動速度が滑らかに上昇します。ゲームオーバー時はローカルランキング (`LOCAL RANKING`) が更新されます。
 
 ### 遊び方
-1. Wi-Fi `ESP32-Web-Server` に接続します（パスワード: `11111111`）。
+1. Wi-Fi `ESP32-Web-Server` に接続します（パスワード: `11111111`、`main.cpp` で変更可能）。
 2. 自動的に表示される画面で名前（ID）を入力します。
 3. `[ AUTO MATCH ]` をクリックするか、ルーム番号を入力して `JOIN` を押します。
 4. **操作**: ボタンは `<- TURN` と `TURN ->` のみ。現在の進行方向に対して左右に曲がります（親指操作に最適化）。
-5. **勝利条件**: 先にリンゴを10個食べて100点に到達した人が勝ちです。
-6. **殿堂入り**: 勝者のIDは、ESP32の電源が切れるまで、接続している全スマホの画面下部に表示され続けます。
+5. **勝利条件**: マルチプレイヤーでは、ホストが設定した目標スコアに先に到達した人が勝ちです。
+6. **殿堂入り**: 勝者のIDは、ESP32に接続している全スマホの画面下部に整然と両端揃えで表示され続けます。
 
 ### デプロイ方法 (PlatformIO)
 このプロジェクトはPlatformIOで構築されています。VSCode + PlatformIOがインストールされていることを確認してください。
